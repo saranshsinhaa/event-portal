@@ -1,0 +1,23 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install SSH client
+        run: sudo apt-get update && sudo apt-get install openssh-client -y
+
+      - name: Use SSH key for authentication
+        run: echo "${{ secrets.AZURE_VM_PEM }}" > ~/.ssh/azure_vm.pem && chmod 600 ~/.ssh/azure_vm.pem
+
+      - name: Run deployment script
+        run: ssh -i ~/.ssh/azure_vm.pem saransh@20.244.27.5 'bash /home/saransh/event-portal/script.sh'
